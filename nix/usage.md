@@ -6,6 +6,8 @@ In your regular shell, you can type:
 
 Once dropped into a shell in the Aider environment, you can type:
 
-    aider-install  # to install Aider and dependencies
+    aider-install  # to install Aider and dependencies to $AIDER_ENV_DIR or ~/.cache/aider-chat
     aider          # to run Aider
 
+To make an editable Python package install, define `AIDER_EDITABLE=1`
+in the environment before running `aider-install`.
