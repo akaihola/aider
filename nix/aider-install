@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+pip install \
+  --upgrade\
+  '.[help]' \
+  --extra-index-url=https://download.pytorch.org/whl/cpu
+echo Downgrading to playwright==1.40.0 which is hopefully
+echo compatible with playwright-driver.browsers from NixOS
+pip install playwright==1.40.0
+
+echo Installing Node.js modules for Eslint
+npm install -g eslint@9.x globals @eslint/js
+
+echo Now either symlink global Node modules or install them locally:
+echo   ln -s $NPM_CONFIG_PREFIX/lib/node_modules
+echo   npm install globals @eslint/js
