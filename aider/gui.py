@@ -5,6 +5,7 @@ import random
 import sys
 
 import streamlit as st
+from streamlit_tree_select import tree_select
 
 from aider import urls
 from aider.coders import Coder
@@ -185,27 +186,83 @@ class GUI:
         self.do_add_web_page()
 
     def do_add_files(self):
-        fnames = st.multiselect(
-            "Add files to the chat",
-            self.coder.get_all_relative_files(),
-            default=self.state.initial_inchat_files,
-            placeholder="Files to edit",
-            disabled=self.prompt_pending(),
-            help=(
-                "Only add the files that need to be *edited* for the task you are working"
-                " on. Aider will pull in other relevant code to provide context to the LLM."
-            ),
-        )
+        all_files = self.coder.get_all_relative_files()
+        inchat_files = self.coder.get_inchat_relative_files()
 
-        for fname in fnames:
-            if fname not in self.coder.get_inchat_relative_files():
+        # Create a tree structure for the files
+        nodes = self.create_file_tree(all_files)
+
+        with st.popover(
+            "Add files to the chat",
+            use_container_width=True,
+            # Double space plus newline needed for a line break in the tooltip:
+            help=(
+                "Only add the files that need to be *edited* for  \n"
+                "the task you are working on.  Aider will pull in  \n"
+                "other relevant code to provide context to the LLM."
+            )
+        ):
+
+            def get_expanded_nodes(nodes_):
+                for node in nodes_:
+                    if node.get("expanded"):
+                        yield node["value"]
+                    children = node.get("children")
+                    if children:
+                        yield from get_expanded_nodes(children)
+
+            # Get the selected files using tree_select
+            return_select = tree_select(
+                nodes,
+                key="file_tree",
+                checked=inchat_files,
+                expanded=list(get_expanded_nodes(nodes)),
+                expand_on_click=True,
+                only_leaf_checkboxes=True,
+                disabled=self.prompt_pending(),
+            )
+
+        selected_files = return_select['checked']
+
+        for fname in selected_files:
+            if fname not in inchat_files and not os.path.isdir(fname):
                 self.coder.add_rel_fname(fname)
                 self.info(f"Added {fname} to the chat")
 
-        for fname in self.coder.get_inchat_relative_files():
-            if fname not in fnames:
+        for fname in inchat_files:
+            if fname not in selected_files:
                 self.coder.drop_rel_fname(fname)
                 self.info(f"Removed {fname} from the chat")
+
+    def create_file_tree(self, files):
+        tree = {}
+        for file in files:
+            parts = file.split('/')
+            current = tree
+            for part in parts[:-1]:
+                if part not in current:
+                    current[part] = {}
+                current = current[part]
+            current[parts[-1]] = file
+
+        def build_nodes(subtree, prefix=""):
+            nodes = []
+            for key, value in subtree.items():
+                if isinstance(value, dict):
+                    path = os.path.join(prefix, key)
+                    nodes.append(
+                        {
+                            "label": f"📁 {key}",
+                            "value": path,
+                            "children": build_nodes(value, path),
+                            "expanded": True,
+                        }
+                    )
+                else:
+                    nodes.append({"label": key, "value": value})
+            return nodes
+
+        return build_nodes(tree)
 
     def do_add_web_page(self):
         with st.popover("Add a web page to the chat"):
