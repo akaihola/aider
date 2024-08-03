@@ -21,6 +21,9 @@
             playwright-driver
             playwright-driver.browsers
           ]))
+
+          pkgs.wl-clipboard
+          pkgs.xclip
         ];
         envVars = {
           # https://discourse.nixos.org/t/how-to-solve-libstdc-not-found-in-shell-nix/25458
