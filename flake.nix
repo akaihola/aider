@@ -69,6 +69,7 @@
           default = flake-utils.lib.mkApp {
             drv = pkgs.writeShellScriptBin "aider" ''
               ${environmentSetupScript}
+              ${pkgs.lib.concatMapStrings (pkg: "export PATH=${pkg}/bin:$PATH\n") buildInputs}
               grep -B100 "^Once" ${./nix/usage.md} | head --lines=-1
               exec aider "$@"
             '';
@@ -76,12 +77,14 @@
           install = flake-utils.lib.mkApp {
             drv = pkgs.writeShellScriptBin "aider-install" ''
               ${environmentSetupScript}
+              ${pkgs.lib.concatMapStrings (pkg: "export PATH=${pkg}/bin:$PATH\n") buildInputs}
               exec aider-install
             '';
           };
         };
 
         devShells.default = pkgs.mkShell {
+          buildInputs = buildInputs;
           shellHook = ''
             ${environmentSetupScript}
             cat ${./nix/usage.md}
