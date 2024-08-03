@@ -47,7 +47,8 @@
 
         environmentSetupScript = ''
           source ${exportEnvironmentVariables}
-          ENV="''${XDG_CACHE_HOME:-''${HOME}/.cache}/aider-chat"
+          ENV="''${AIDER_ENV_DIR:-''${XDG_CACHE_HOME:-''${HOME}/.cache}/aider-chat}"
+          echo Aider environment is in ''${ENV}
           VENV=$ENV/.venv
           export NPM_CONFIG_PREFIX=$ENV/.npm-global
           if [ ! -d $VENV ]; then
