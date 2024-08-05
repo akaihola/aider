@@ -1,4 +1,5 @@
 import configparser
+import importlib.util
 import json
 import os
 import re
@@ -216,12 +217,17 @@ def check_streamlit_install(io):
 def launch_gui(args):
     from streamlit.web import cli
 
-    from aider import gui
-
     print()
     print("CONTROL-C to exit...")
 
-    target = gui.__file__
+    # This is a hack to get the path to the module. We can't use the normal import
+    # because it will cause the `tree_select` widget to fail initialization for a
+    # yet unknown reason.
+    gui_spec = importlib.util.find_spec("aider.gui")
+    if gui_spec is None:
+        raise ImportError("Could not find aider.gui module")
+
+    target = gui_spec.origin
 
     st_args = ["run", target]
 
