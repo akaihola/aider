@@ -1,12 +1,24 @@
 #!/usr/bin/env bash
 
+PACKAGE_NAME=$(\
+    pip install --dry-run --quiet --report=- . \
+    | jq --raw-output '.install[0].metadata.name' \
+    2> /dev/null \
+)
+if [ "${PACKAGE_NAME}" != "aider-chat" ]; then
+    echo
+    echo ERROR: `nix run '.#install'` and `aider-install` and must be run
+    echo        from the root of the aider-chat source tree
+    exit 1
+fi
+
 EDITABLE=
 if [ -n "$AIDER_EDITABLE" ] && [ "$AIDER_EDITABLE" != "0" ]; then
     EDITABLE="--editable"
 fi
 pip install \
     --upgrade\
-    ${EDITABLE} '.[browser,help]' \
+    ${EDITABLE} ".[browser,help]" \
     --extra-index-url=https://download.pytorch.org/whl/cpu
 echo Downgrading to playwright==1.40.0 which is hopefully
 echo compatible with playwright-driver.browsers from NixOS
