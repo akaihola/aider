@@ -10,20 +10,24 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
         python = pkgs.python3;
-        buildInputs = with pkgs; [
-          pkgs.libsecret  # for secret-tool to manage API keys
-          pkgs.nodejs  # for ESLint
-
-          (pkgs.python3.withPackages (ps: with ps; [
+        pythonWithEnv = (pkgs.python3.withPackages (ps: with ps; [
             # https://aider.chat/docs/install/optional.html#enable-playwright
             # https://nixos.wiki/wiki/Playwright
-            playwright  # instead of letting Aider install it
-            playwright-driver
-            playwright-driver.browsers
-          ]))
-
+            #
+            # TODO: figure out how this works now;
+            #       would it be enough to just install the .browsers package?
+            pkgs.playwright
+            pkgs.playwright-driver
+            pkgs.playwright-driver.browsers
+          ]));
+        buildInputs = [
+          pkgs.libsecret  # for secret-tool to manage API keys
+          pkgs.nodejs     # for ESLint
+          pkgs.uv         # a faster alternative to pip
           pkgs.wl-clipboard
           pkgs.xclip
+          python
+          pythonWithEnv
         ];
         envVars = {
           # https://discourse.nixos.org/t/how-to-solve-libstdc-not-found-in-shell-nix/25458
@@ -55,9 +59,10 @@
           VENV=$ENV/.venv
           export NPM_CONFIG_PREFIX=$ENV/.npm-global
           if [ ! -d $VENV ]; then
-            python -m venv $VENV
+            uv venv -vv --python=${python}/bin/python $VENV
           fi
           source $VENV/bin/activate
+          export UV_PYTHON=''${VIRTUAL_ENV}/bin/python
           export PATH=$NPM_CONFIG_PREFIX/bin:${./nix}:$PATH
           echo  # an empty line before usage instructions
         '';
@@ -68,16 +73,16 @@
         apps = {
           default = flake-utils.lib.mkApp {
             drv = pkgs.writeShellScriptBin "aider" ''
-              ${environmentSetupScript}
               ${pkgs.lib.concatMapStrings (pkg: "export PATH=${pkg}/bin:$PATH\n") buildInputs}
+              ${environmentSetupScript}
               grep -B100 "^Once" ${./nix/usage.md} | head --lines=-1
               exec aider "$@"
             '';
           };
           install = flake-utils.lib.mkApp {
             drv = pkgs.writeShellScriptBin "aider-install" ''
-              ${environmentSetupScript}
               ${pkgs.lib.concatMapStrings (pkg: "export PATH=${pkg}/bin:$PATH\n") buildInputs}
+              ${environmentSetupScript}
               exec aider-install
             '';
           };
