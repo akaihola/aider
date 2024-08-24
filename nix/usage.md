@@ -12,3 +12,14 @@ Once dropped into a shell in the Aider environment, you can type:
 
 To make an editable Python package install, define `AIDER_EDITABLE=1`
 in the environment before running `aider-install`.
+You can provide initialization commands to be executed when entering the devShell:
+
+    AIDER_INIT_CMDS="command1; command2; command3" \
+    nix develop
+
+For example:
+
+    AIDER_INIT_CMDS="git checkout my-branch; git stash pop" \
+    nix develop
+
+Multiple commands should be separated by semicolons.
