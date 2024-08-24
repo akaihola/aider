@@ -92,6 +92,14 @@
           buildInputs = buildInputs;
           shellHook = ''
             ${environmentSetupScript}
+
+            # Execute user-provided initialization commands
+            if [ -n "''$AIDER_INIT_CMDS" ]; then
+              echo "Executing initialization commands:"
+              echo "''$AIDER_INIT_CMDS"
+              eval "''$AIDER_INIT_CMDS"
+            fi
+
             cat ${./nix/usage.md}
             exec zsh
           '';
