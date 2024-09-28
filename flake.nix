@@ -59,7 +59,7 @@
           VENV=$ENV/.venv
           export NPM_CONFIG_PREFIX=$ENV/.npm-global
           if [ ! -d $VENV ]; then
-            uv venv -vv --python=${python}/bin/python $VENV
+            uv venv -vv --python=${python}/bin/python --seed $VENV
           fi
           source $VENV/bin/activate
           export UV_PYTHON=''${VIRTUAL_ENV}/bin/python
