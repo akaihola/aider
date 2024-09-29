@@ -20,9 +20,9 @@ class EditBlockCoder(Coder):
 
     # Define dividers in a configuration dictionary
     edit_block_config = {
-        "search_divider": "<<<<<<< SEARCH",
-        "middle_divider": "=======",
-        "replace_divider": ">>>>>>> REPLACE"
+        "search_divider": "<AIDER-SEARCH>",
+        "middle_divider": "</AIDER-SEARCH> <AIDER-REPLACE>",
+        "replace_divider": "</AIDER-REPLACE>"
     }
 
     def get_system_prompt_kwargs(self):
