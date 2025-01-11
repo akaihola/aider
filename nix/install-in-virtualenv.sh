@@ -9,4 +9,4 @@
 uv venv
 
 # Install the package in editable mode with all of its extras (if any).
-uv pip install --all-extras --editable=.
+uv pip compile --all-extras pyproject.toml | uv pip install -r - -e .
