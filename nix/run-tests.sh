@@ -7,7 +7,7 @@ errors=0
 
 if [ -f pyproject.toml ]; then
     # This looks like a Python package.
-    source "$SCRIPT_DIR/install-in-virtualenv.sh"
+    source ${INSTALL_IN_VIRTUALENV_CMD}
 
     # Run pytest if it's available.
     if command -v pytest &> /dev/null; then
