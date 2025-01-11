@@ -13,7 +13,7 @@ if [ -f pyproject.toml ]; then
         command -v "$1" && ( $@ || errors=$? )
     }
 
-    source ${VENV}/bin/activate
+    source .venv/bin/activate
     run darker
     run graylint
 fi
