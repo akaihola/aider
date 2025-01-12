@@ -3,13 +3,12 @@
 errors=0
 
 run() {
-    echo $UV_PYTHON
-    command -v uv && uv pip show "$1" && ( uv run $@ || errors=$? )
+    command -v uv >/dev/null && uv pip show --quiet "$1" && ( uv run $@ || errors=$? )
 }
 
 if [ -f pyproject.toml ]; then
     # This looks like a Python package.
-    uv sync --all-groups --all-extras
+    uv sync --quiet --all-groups --all-extras
     UV_PYTHON=.venv
     run darker
     run graylint
