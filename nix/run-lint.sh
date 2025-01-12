@@ -1,19 +1,15 @@
 #!/usr/bin/env bash
 
-# Get the directory of the current script
-SCRIPT_DIR="${BASH_SOURCE[0]%/*}"
-
 errors=0
+
+run() {
+    command -v uv && uv pip show --quiet "$1" && ( uv run $@ || errors=$? )
+}
 
 if [ -f pyproject.toml ]; then
     # This looks like a Python package.
-    source ${INSTALL_IN_VIRTUALENV_CMD}
-
-    run() {
-        command -v "$1" && ( $@ || errors=$? )
-    }
-
-    source .venv/bin/activate
+    uv sync --all-groups --all-extras
+    UV_PYTHON=.venv
     run darker
     run graylint
 fi
@@ -21,10 +17,10 @@ fi
 for file in "$@"; do
     case "$file" in
         *.yml|*.yaml)
-            run yamllint "$file"
+            uvx yamllint "$file"
             ;;
         *.sh|*.md|*.rst|*.txt)
-            run codespell "$file"
+            uvx codespell "$file"
             ;;
     esac
 done
@@ -35,7 +31,7 @@ if [ -f Cargo.toml ]; then
 fi
 
 if find -regex ".*\.\(m?j\|t\)s$" -print | grep -q .; then
-  run eslint "$@"
+  command -v eslint && eslint "$@"
 fi
 
 find -name "*.nix" -exec nix-instantiate --parse {} \+ >/dev/null || errors=$?
