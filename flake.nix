@@ -42,7 +42,6 @@
 
           AIDER_LINT_CMD = "${./nix/run-lint.sh}";
           AIDER_TEST_CMD = "${./nix/run-tests.sh}";
-          INSTALL_IN_VIRTUALENV_CMD = "${./nix/install-in-virtualenv.sh}";
         };
 
         # Function to create a string of export statements
