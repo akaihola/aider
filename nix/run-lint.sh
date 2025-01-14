@@ -3,7 +3,8 @@
 errors=0
 
 run() {
-    command -v uv >/dev/null && uv pip show --quiet "$1" && ( uv run $@ || errors=$? )
+    local -n errors_ref=errors
+    command -v uv >/dev/null && uv pip show --quiet "$1" && ( uv run $@ || errors_ref=$? )
 }
 
 if [ -f pyproject.toml ]; then
