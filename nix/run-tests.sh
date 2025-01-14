@@ -4,7 +4,7 @@ errors=0
 
 if [ -f pyproject.toml ]; then
     # This looks like a Python package.
-    uv sync --all-groups --all-extras
+    uv sync --quiet --all-groups --all-extras
     UV_PYTHON=.venv
 
     # Run pytest if it's available.
