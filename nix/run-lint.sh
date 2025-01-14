@@ -4,7 +4,9 @@ errors=0
 
 run() {
     local -n errors_ref=errors
-    command -v uv >/dev/null && uv pip show --quiet "$1" && ( uv run $@ || errors_ref=$? )
+    command -v uv >/dev/null || return
+    uv pip show --quiet "$1" || return
+    uv run $@ || errors_ref=$?
 }
 
 if [ -f pyproject.toml ]; then
