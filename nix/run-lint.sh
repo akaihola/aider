@@ -17,21 +17,21 @@ fi
 for file in "$@"; do
     case "$file" in
         *.yml|*.yaml)
-            uvx yamllint "$file"
+            uvx yamllint "$file" || errors=$?
             ;;
         *.sh|*.md|*.rst|*.txt)
-            uvx codespell "$file"
+            uvx codespell "$file" || errors=$?
             ;;
     esac
 done
 
 if [ -f Cargo.toml ]; then
-  rustfmt --edition=2021 "$@"
-  run cargo clippy
+  rustfmt --edition=2021 "$@" || errors=$?
+  run cargo clippy || errors=$?
 fi
 
 if find -regex ".*\.\(m?j\|t\)s$" -print | grep -q .; then
-  command -v eslint && eslint "$@"
+  command -v eslint && eslint "$@" || errors=$?
 fi
 
 find -name "*.nix" -exec nix-instantiate --parse {} \+ >/dev/null || errors=$?
