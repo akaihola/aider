@@ -33,8 +33,10 @@ if [ -f Cargo.toml ]; then
   run cargo clippy || errors=$?
 fi
 
-if find -regex ".*\.\(m?j\|t\)s$" -print | grep -q .; then
-  command -v eslint && eslint "$@" || errors=$?
+if git ls-files "*.js" "*.mjs" "*.ts" 2>/dev/null | grep -q .; then
+  if command -v eslint >/dev/null; then
+    eslint "$@" || errors=$?
+  fi
 fi
 
 find -name "*.nix" -exec nix-instantiate --parse {} \+ >/dev/null || errors=$?
