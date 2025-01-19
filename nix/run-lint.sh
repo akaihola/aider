@@ -11,7 +11,8 @@ run() {
 
 if [ -f pyproject.toml ]; then
     # This looks like a Python package.
-    VIRTUAL_ENV= uv sync --quiet --all-groups --all-extras
+    VIRTUAL_ENV=
+    uv sync --quiet --all-groups --all-extras
     UV_PYTHON=.venv
     run darker
     run graylint
