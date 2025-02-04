@@ -11,6 +11,7 @@
         pkgs = nixpkgs.legacyPackages.${system};
         python = pkgs.python3;
         pythonWithEnv = (pkgs.python3.withPackages (ps: with ps; [
+            pkgs.libffi
             # https://aider.chat/docs/install/optional.html#enable-playwright
             # https://nixos.wiki/wiki/Playwright
             #
