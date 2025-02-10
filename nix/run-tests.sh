@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# if there's a run-tests.sh in the project, use that instead
+if [ -f run-tests.sh ]; then
+    exec ./run-tests.sh
+fi
+
 errors=0
 
 if [ -f pyproject.toml ]; then

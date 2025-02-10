@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# if there's a run-lint.sh in the project, use that instead
+if [ -f run-lint.sh ]; then
+    exec ./run-lint.sh
+fi
+
 errors=0
 
 run() {
