@@ -11,7 +11,6 @@
         pkgs = nixpkgs.legacyPackages.${system};
         python = pkgs.python3;
         pythonWithEnv = (pkgs.python3.withPackages (ps: with ps; [
-            pkgs.libffi
             # https://aider.chat/docs/install/optional.html#enable-playwright
             # https://nixos.wiki/wiki/Playwright
             #
@@ -22,6 +21,7 @@
             pkgs.playwright-driver.browsers
           ]));
         buildInputs = [
+          pkgs.libffi     # e.g. cryptography needs ffi.h
           pkgs.libsecret  # for secret-tool to manage API keys
           pkgs.nodejs     # for ESLint
           pkgs.uv         # a faster alternative to pip
